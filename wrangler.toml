@@ -3,14 +3,15 @@ main = "src/index.ts"
 compatibility_date = "2024-01-01"
 
 # Weekly clustering schedule: Every Sunday at 3 AM UTC
-[triggers]
-crons = ["0 3 * * 0"]
+# NOTE: Add cron trigger via Cloudflare Dashboard > Worker > Triggers > Cron Triggers
+# Cron expression: 0 3 * * 0 (Every Sunday at 3:00 AM UTC)
+# [triggers]
+# crons = ["0 3 * * 0"]
 
 # Environment variables (set via wrangler secret or dashboard)
 [vars]
 VERTEX_AI_LOCATION = "us-central1"
 
-# Secrets to configure:
+# Secrets to configure via Cloudflare Dashboard:
 # - FIREBASE_PROJECT_ID
 # - FIREBASE_SERVICE_ACCOUNT_KEY (JSON string)
-# - GOOGLE_ACCESS_TOKEN (for Vertex AI)
