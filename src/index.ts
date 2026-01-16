@@ -7,6 +7,7 @@
 
 import { FirestoreClient } from './lib/firestore';
 import { kMeansClustering, cosineSimilarity } from './lib/kmeans';
+import { getGoogleAccessToken } from './lib/auth';
 import type { Env, ClusterResult, ClusteringStats } from './types';
 
 // Configuration
@@ -110,8 +111,8 @@ async function runClustering(
 ): Promise<ClusterResult[]> {
     const { k, sampleSize } = options;
 
-    // 1. Get access token for Firestore
-    const accessToken = await getAccessToken(env);
+    // 1. Get access token for Firestore using JWT auth
+    const accessToken = await getGoogleAccessToken(env.FIREBASE_SERVICE_ACCOUNT_KEY);
     const firestore = new FirestoreClient(env.FIREBASE_PROJECT_ID, accessToken);
 
     // 2. Fetch posts with embeddings
@@ -206,38 +207,11 @@ async function runClustering(
 }
 
 /**
- * Get Google access token for Firestore API
- */
-async function getAccessToken(env: Env): Promise<string> {
-    // For now, use a pre-generated access token stored as a secret
-    // In production, implement JWT-based service account auth
-    // See: https://cloud.google.com/identity-platform/docs/use-rest-api#generate_an_access_token
-
-    // TODO: Implement proper OAuth2 service account flow
-    // For MVP, we can use a refresh token or short-lived access token
-
-    const serviceAccountKey = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}');
-
-    // Simple implementation - in production use proper JWT signing
-    if (!serviceAccountKey.private_key) {
-        throw new Error('Service account key not configured');
-    }
-
-    // For the MVP, you'll need to generate an access token externally
-    // and pass it as an environment variable
-    // Real implementation would use JWT assertion grant
-
-    throw new Error(
-        'Access token generation not implemented. ' +
-        'Please set GOOGLE_ACCESS_TOKEN as a Cloudflare secret, or implement JWT auth.'
-    );
-}
-
-/**
  * Update clustering stats in Firestore
  */
 async function updateStats(env: Env, stats: ClusteringStats): Promise<void> {
-    const accessToken = await getAccessToken(env);
+    const accessToken = await getGoogleAccessToken(env.FIREBASE_SERVICE_ACCOUNT_KEY);
     const firestore = new FirestoreClient(env.FIREBASE_PROJECT_ID, accessToken);
     await firestore.updateClusteringStats(stats);
 }
+
